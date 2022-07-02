@@ -9,9 +9,9 @@ const getproducts = async () => {
     await fetch("http://localhost:3000/api/products")
     .then(res=> res.json())
     .then(data =>  products = data)
-    .catch(err => console.log(err))
-    console.log(products);
-    displayProducts(products)
+    .catch(err => console.log(err));
+
+    displayProducts(products);
 };
 
 //*** Fonction pour afficher les produits grâce a la fonction map ***/
@@ -20,7 +20,7 @@ const getproducts = async () => {
 const displayProducts = (products) => {
     products.map( product => {
         productsContainer.innerHTML += `
-        <a href="./product.html?${product._id}">
+        <a href="./product.html?${"id=" + product._id}">
             <article>
                 <img src="${product.imageUrl}" alt="Lorem ipsum dolor sit amet, Kanap name1">
                 <h3 class="productName">${product.name}</h3>
