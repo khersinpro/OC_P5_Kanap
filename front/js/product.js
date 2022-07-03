@@ -70,6 +70,8 @@ const cartBtn = document.getElementById('addToCart');
 cartBtn.addEventListener('click', (e) => {
         let color = document.getElementById('colors').value;
         let quantity = document.getElementById('quantity').value;
+        let productImg = productData.imageUrl;
+        let name = productData.name;
         
         //conditions pour empecher une commande sans quantity/color
         if(color === ""){
@@ -78,7 +80,7 @@ cartBtn.addEventListener('click', (e) => {
             return alert('Veuillez choisir une quantité');
         }; 
 
-        addProduct({productId, quantity, color});
+        addProduct({productId, quantity, color, productImg, name});
 });
 
 getProduct();
