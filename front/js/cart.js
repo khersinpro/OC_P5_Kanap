@@ -131,3 +131,35 @@ const page = async () => {
 page()
 
 //REGEX AND FORM INPUTS CONTROL
+
+const inputsChange = () => {
+    const inputs = document.querySelectorAll('form input');
+
+    inputs.forEach(input => {
+        input.addEventListener("input", e => {
+            switch(e.target.id){
+                case 'firstName':
+                    console.log("firstName");
+                    break
+                case 'lastName':
+                    console.log("lastName");
+                    break
+                case 'address':
+                    console.log("adress");
+                    break
+                case 'city':
+                    console.log("city");
+                    break
+                case 'email':
+                    console.log("email");
+                    break
+                default:
+                    break
+            }
+        })
+    });
+}
+
+inputsChange()
+
+
