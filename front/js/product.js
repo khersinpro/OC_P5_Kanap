@@ -72,7 +72,7 @@ cartBtn.addEventListener('click', (e) => {
         let quantity = document.getElementById('quantity').value;
         let productImg = productData.imageUrl;
         let name = productData.name;
-        
+          
         //conditions pour empecher une commande sans quantity/color
         if(color === ""){
             return alert('Choisissez une couleur avant de valider la commande'); 

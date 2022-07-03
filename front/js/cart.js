@@ -1,7 +1,7 @@
 let products;
 
-const getproducts = () => {
-    fetch("http://localhost:3000/api/products")
+const getproducts = async () => {
+    await fetch("http://localhost:3000/api/products")
     .then(res=> res.json())
     .then(data =>  products = data)
     .catch(err => console.log(err));
@@ -33,8 +33,11 @@ const modifyQuantity = () => {
             let product = data.find( data => data.productId === button.dataset.id  && data.color === button.dataset.color );
             if(product !== undefined){
                 product.quantity = e.target.value; 
+                e.path[3].childNodes[1].childNodes[5].textContent = price(product);
                 saveCart(data)
+                test()
             }
+
         })
     })
 }
@@ -46,13 +49,14 @@ const deleteItem = () => {
     
     deleteBtn.forEach(button => {
         button.addEventListener("click", e => {
-            let newData = data.filter( article => article.productId === button.dataset.id && article.color !== button.dataset.color);
+            let newData = data.filter( article => !(article.productId === button.dataset.id && article.color === button.dataset.color));
             saveCart(newData)
             location.reload()
         })
     })
 }
 
+//affichage du cart du localstorage
 const displayCart = () => {
     const cartContainer =  document.getElementById('cart__items');
     let cartData = getCart();
@@ -67,7 +71,7 @@ const displayCart = () => {
                 <div class="cart__item__content__description">
                     <h2>${data.name}</h2>
                     <p>${data.color}</p>
-                    <p>42,00 €</p>
+                    <p>${price(data)}</p>
                 </div>
                 <div class="cart__item__content__settings">
                     <div class="cart__item__content__settings__quantity">
@@ -83,11 +87,47 @@ const displayCart = () => {
         `
     })
 }
+const totalPrice = () => {
+    const cart = getCart()
+    let totalPrice = 0;
+    for(let article of cart){
+        let prod = products.find(prod => prod._id === article.productId);
+        totalPrice += parseInt(prod.price) * parseInt(article.quantity); 
+    }
+    return totalPrice
+}
+
+const totalQuantity = () => {
+    const cart = getCart();
+    let totalProducts = 0;
+
+    for(let article of cart){
+        totalProducts += parseInt(article.quantity)
+    };
+
+    return totalProducts;
+}
+
+const price = (data) => {
+    let prod = products.find(prod => prod._id === data.productId);
+    return prod.price * data.quantity + " €"
+}
+
+
+const test = () => {
+    const quantity = document.getElementById('totalQuantity');
+    const price = document.getElementById('totalPrice');
+    price.textContent = totalPrice()
+    quantity.textContent = totalQuantity()
+}
 
 const page = async () => {
     await getproducts()
     modifyQuantity()
     deleteItem()
+    test()
 }
 
 page()
+
+//REGEX AND FORM INPUTS CONTROL
