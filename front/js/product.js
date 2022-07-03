@@ -1,9 +1,9 @@
 const url = new URL(window.location.href);
-const searchParams =  new URLSearchParams(url.search).get('id');
+const productId =  new URLSearchParams(url.search).get('id');
 let productData;
 
 const getProduct = async () => {
-    await fetch(`http://localhost:3000/api/products/${searchParams}`)
+    await fetch(`http://localhost:3000/api/products/${productId}`)
     .then(res=> res.json())
     .then(data => productData = data)
     .catch(err => console.log(err));
@@ -25,9 +25,62 @@ const displayProduct = () => {
     productName.textContent = productData.name;
     title.textContent = productData.name;
     productData.colors.map(color => 
-        colors.innerHTML += `<option value="vert">${color}</option>`    
+        colors.innerHTML += `<option value="${color}">${color}</option>`    
     );
 }
 
+
+// sauvegarde du cart
+const saveCart = (articles) => {
+    localStorage.setItem("cart", JSON.stringify(articles));
+}
+
+// recupération de localestorage, si pas de localeStorage la fonction retourne un array vide
+const getCart = () => {
+    let cart = localStorage.getItem('cart');
+    if(cart == null){
+        return [];
+    }else{
+        return JSON.parse(cart);
+    }
+}
+
+// ajouter un article
+const addProduct = (article) => {
+    // insertion du panier vide ou non dans la variable products
+    let products = getCart();
+    //recherche si il y a un article  avec le même id/color dans le panier
+    let foundProduct = products.find(art => art.id === article.id && art.color === article.color);
+    //si il y a un produit trouvé
+    if(foundProduct !== undefined){
+        //changement de la quantité du produit
+        foundProduct.quantity = parseInt(foundProduct.quantity) + parseInt(article.quantity);
+        //si il n'y a pas de produit trouvé    
+    }else{
+        //ajout du prodruit dans la variable products grace a push()
+        products.push(article);
+    }
+    //sauvegarde du tableau contenant les objets produits dans le localeStorage
+    saveCart(products);
+}
+
+//EventListerner au clic sur le bouton commandé
+//cette fonction permet de verifier si l'article commandé est conforme et de l'ajouter au panier
+const cartBtn = document.getElementById('addToCart');
+cartBtn.addEventListener('click', (e) => {
+        let color = document.getElementById('colors').value;
+        let quantity = document.getElementById('quantity').value;
+        
+        //conditions pour empecher une commande sans quantity/color
+        if(color === ""){
+            return alert('Choisissez une couleur avant de valider la commande'); 
+        }else if(quantity < 1){
+            return alert('Veuillez choisir une quantité');
+        }; 
+
+        addProduct({productId, quantity, color});
+});
+
 getProduct();
+
 
