@@ -117,49 +117,91 @@ const price = (data) => {
 const test = () => {
     const quantity = document.getElementById('totalQuantity');
     const price = document.getElementById('totalPrice');
-    price.textContent = totalPrice()
-    quantity.textContent = totalQuantity()
-}
+    price.textContent = totalPrice();
+    quantity.textContent = totalQuantity();
+};
 
 const page = async () => {
-    await getproducts()
-    modifyQuantity()
-    deleteItem()
-    test()
-}
+    await getproducts();
+    modifyQuantity();
+    deleteItem();
+    test();
+    inputsChange();
+};
 
-page()
+page();
 
 //REGEX AND FORM INPUTS CONTROL
 
+//***Doit contenir 1 lettre mini, peut contenir -/ /' ***/
+const nameReg = /^[a-zA-Zéèàîïùâ]+(([' -][a-zA-Z ])?[a-zA-Zéèàîïùâ]*)*$/ ;
+//*** numeric and letter _ . - + numeric and letters min 2 max 10 + letters min 2 max 5 ***/
+const emailReg = "^[a-zA-Z0-9._-]+@[a-zA-Z0-9]{2,10}\.[a-zA-Z]{2,5}";
+
+//variable pour recuperer les données du formulaire
+let firstName, lastName, address, city, email;
+
+//control des entrées dans les inputs
+const inputControl = (data, regex) => {
+    return data.match(regex);
+};
+
+//fonction d'affichage d'erreur d'entré et implémentation des données utilisateurs
+
+const handleUserData = (event, regex, targetId, errorMsg) => {
+    if(!inputControl(event.target.value, regex)){
+        if(event.target.value.length < 1){
+            document.getElementById(targetId).textContent = '';
+        }else{
+            document.getElementById(targetId).textContent = errorMsg;
+        };
+        return null;
+    }else{
+        document.getElementById(targetId).textContent = '';
+         return event.target.value;
+    };
+};
+
+// fonction switch qui permet de cibler tous les inputs séparement et de controler les entrées avec les fonctions ci dessus
 const inputsChange = () => {
     const inputs = document.querySelectorAll('form input');
+    let errorMsg;
 
     inputs.forEach(input => {
         input.addEventListener("input", e => {
             switch(e.target.id){
                 case 'firstName':
-                    console.log("firstName");
+                    errorMsg = 'Veuillez rentrer un prénom valide';
+                    firstName = handleUserData(e, nameReg, "firstNameErrorMsg", errorMsg);
                     break
                 case 'lastName':
-                    console.log("lastName");
+                    errorMsg = 'Veuillez rentrer un nom valide';
+                    lastName = handleUserData(e, nameReg, "lastNameErrorMsg", errorMsg);
                     break
                 case 'address':
-                    console.log("adress");
+                    errorMsg = 'Veuillez rentrer une adress valide';
+                    firstName = handleUserData(e, nameReg, "addressErrorMsg", errorMsg);
                     break
                 case 'city':
-                    console.log("city");
+                    errorMsg = 'Veuillez rentrer une ville valide';
+                    firstName = handleUserData(e, nameReg, "cityErrorMsg", errorMsg);
                     break
                 case 'email':
-                    console.log("email");
+                    errorMsg = 'Veuillez rentrer une adresse mail valide';
+                    firstName = handleUserData(e, emailReg, "emailErrorMsg", errorMsg);
                     break
                 default:
-                    break
+                break
             }
         })
     });
-}
+};
 
-inputsChange()
+// validation de la commande 
+
+document.getElementById('order').addEventListener('submit', e => {
+    e.preventDefault
+})
+
 
 
