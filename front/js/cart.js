@@ -60,7 +60,14 @@ const deleteItem = () => {
 const displayCart = () => {
     const cartContainer =  document.getElementById('cart__items');
     let cartData = getCart();
-    cartData.map( data => {
+
+    //methode sort pour tier la tableau d'objet par l'id grace a localecompare
+    let sortCart = cartData.sort(function(a, b) { 
+        //locale compare renvoie un nb negatif 0 positif si la chaine est inferieur egale ou supérieur
+        return a.productId.localeCompare(b.productId);
+      });
+
+    sortCart.map( data => {
         cartContainer.innerHTML +=
         `
         <article class="cart__item" data-id="${data.productId}" data-color="${data.color}">
@@ -136,7 +143,9 @@ page();
 //***Doit contenir 1 lettre mini, peut contenir -/ /' ***/
 const nameReg = /^[a-zA-Zéèàîïùâ]+(([' -][a-zA-Z ])?[a-zA-Zéèàîïùâ]*)*$/ ;
 //*** numeric and letter _ . - + numeric and letters min 2 max 10 + letters min 2 max 5 ***/
-const emailReg = "^[a-zA-Z0-9._-]+@[a-zA-Z0-9]{2,10}\.[a-zA-Z]{2,5}";
+const emailReg = "^[a-zA-Z0-9._-]+@[a-zA-Z0-9]{2,10}\.[a-zA-Z]{2,5}$";
+//*** regex for adress ***/
+const addressReg = /^[a-zA-Z0-9\s,'-]*$/
 
 //variable pour recuperer les données du formulaire
 let firstName, lastName, address, city, email;
@@ -173,22 +182,27 @@ const inputsChange = () => {
                 case 'firstName':
                     errorMsg = 'Veuillez rentrer un prénom valide';
                     firstName = handleUserData(e, nameReg, "firstNameErrorMsg", errorMsg);
+                    console.log(firstName);
                     break
                 case 'lastName':
                     errorMsg = 'Veuillez rentrer un nom valide';
                     lastName = handleUserData(e, nameReg, "lastNameErrorMsg", errorMsg);
+                    console.log(lastName);
                     break
                 case 'address':
                     errorMsg = 'Veuillez rentrer une adress valide';
-                    firstName = handleUserData(e, nameReg, "addressErrorMsg", errorMsg);
+                    address = handleUserData(e, addressReg, "addressErrorMsg", errorMsg);
+                    console.log(address);
                     break
                 case 'city':
                     errorMsg = 'Veuillez rentrer une ville valide';
-                    firstName = handleUserData(e, nameReg, "cityErrorMsg", errorMsg);
+                    city = handleUserData(e, nameReg, "cityErrorMsg", errorMsg);
+                    console.log(city);
                     break
                 case 'email':
                     errorMsg = 'Veuillez rentrer une adresse mail valide';
-                    firstName = handleUserData(e, emailReg, "emailErrorMsg", errorMsg);
+                    email = handleUserData(e, emailReg, "emailErrorMsg", errorMsg);
+                    console.log(email);
                     break
                 default:
                 break
@@ -197,10 +211,40 @@ const inputsChange = () => {
     });
 };
 
-// validation de la commande 
+// validation de la commande et envoi
 
-document.getElementById('order').addEventListener('submit', e => {
-    e.preventDefault
+document.querySelector('form').addEventListener('submit', e => {
+    e.preventDefault();
+    let cart = JSON.parse(localStorage.getItem('cart'));
+    console.log(cart);
+    if(firstName && lastName && address && city && email && cart !== null){
+        let contact = {firstName, lastName, address, city, email};
+        let products = [];
+        for(let item of cart){
+            products.push(item.productId);
+        }
+
+        fetch("http://localhost:3000/api/products/order", {
+            method: "POST",
+            headers: { 
+            'Accept': 'application/json', 
+            'Content-Type': 'application/json' 
+        },
+        body: JSON.stringify({contact , products})
+        })
+        .then(res => res.json())
+        .then(data =>{ 
+            localStorage.clear()
+            window.location = `/P5-Dev-Web-Kanap/front/html/confirmation.html?id=${data.orderId}`
+        })
+        .catch(err => {
+            alert('Une erreur est survenue !')
+            console.log(err)
+        })
+        
+    }else{
+        alert("le formulaire est mal remplis ou le pannier est vide !")
+    }
 })
 
 
