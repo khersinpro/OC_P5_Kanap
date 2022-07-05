@@ -28,7 +28,7 @@ const displayProducts = (products) => {
             </article>
         </a>
         `
-    })
-}
+    });
+};
 
 getproducts();

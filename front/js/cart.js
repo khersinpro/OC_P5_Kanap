@@ -1,5 +1,11 @@
+import { getCart, saveCart } from './reusableFunction.js';
 let products;
 
+//***********************************************************/
+//*************** PARTIS GESTION DU PANNIER *****************/
+//***********************************************************/
+
+//*** Récuperation des produits  ***/
 const getproducts = async () => {
     await fetch("http://localhost:3000/api/products")
     .then(res=> res.json())
@@ -9,21 +15,7 @@ const getproducts = async () => {
     displayCart()
 };
 
-const getCart = () => {
-    let cart = localStorage.getItem('cart');
-    if(cart == null){
-        return [];
-    }else{
-        return JSON.parse(cart);
-    }
-}
-
-// sauvegarde du cart
-const saveCart = (articles) => {
-    localStorage.setItem("cart", JSON.stringify(articles));
-}
-
-//modifier la quantité d'un produit
+//*** modifier la quantité d'un produit ***//
 const modifyQuantity = () => {
     let buttonQuantity = document.querySelectorAll('.cart__item');
     let data = getCart();
@@ -35,14 +27,14 @@ const modifyQuantity = () => {
                 product.quantity = e.target.value; 
                 e.path[3].childNodes[1].childNodes[5].textContent = price(product);
                 saveCart(data)
-                test()
+                allPriceItem()
             }
 
         })
     })
 }
 
-//supprimer un produit
+//*** supprimer un produit ***//
 const deleteItem = () => {
     let deleteBtn = document.querySelectorAll(".deleteItem");
     let data = getCart();
@@ -56,7 +48,7 @@ const deleteItem = () => {
     })
 }
 
-//affichage du cart du localstorage
+//*** affichage du pannier en recuperant le localestorage ***//
 const displayCart = () => {
     const cartContainer =  document.getElementById('cart__items');
     let cartData = getCart();
@@ -65,8 +57,9 @@ const displayCart = () => {
     let sortCart = cartData.sort(function(a, b) { 
         //locale compare renvoie un nb negatif 0 positif si la chaine est inferieur egale ou supérieur
         return a.productId.localeCompare(b.productId);
-      });
+    });
 
+    //injection de l'html avec la methode map
     sortCart.map( data => {
         cartContainer.innerHTML +=
         `
@@ -92,60 +85,67 @@ const displayCart = () => {
             </div>
         </article>
         `
-    })
-}
+    });
+};
+
+//*** calcule du prix d'un article ***//
+const price = (data) => {
+    let prod = products.find(prod => prod._id === data.productId);
+    return prod.price * data.quantity + " €";
+};
+
+//*** Prix total du pannier  ***/
 const totalPrice = () => {
-    const cart = getCart()
+    const cart = getCart();
     let totalPrice = 0;
     for(let article of cart){
         let prod = products.find(prod => prod._id === article.productId);
         totalPrice += parseInt(prod.price) * parseInt(article.quantity); 
-    }
-    return totalPrice
-}
+    };
+    return totalPrice;
+};
 
+//*** calcule de la quantité total d'article ***/
 const totalQuantity = () => {
     const cart = getCart();
     let totalProducts = 0;
 
     for(let article of cart){
-        totalProducts += parseInt(article.quantity)
+        totalProducts += parseInt(article.quantity);
     };
-
     return totalProducts;
-}
+};
 
-const price = (data) => {
-    let prod = products.find(prod => prod._id === data.productId);
-    return prod.price * data.quantity + " €"
-}
-
-
-const test = () => {
+//*** affichage du prix total et du nombre d'article ***/
+const allPriceItem = () => {
     const quantity = document.getElementById('totalQuantity');
     const price = document.getElementById('totalPrice');
     price.textContent = totalPrice();
     quantity.textContent = totalQuantity();
 };
 
+//*** regroupe les fonctions ***/
 const page = async () => {
     await getproducts();
     modifyQuantity();
     deleteItem();
-    test();
+    allPriceItem();
     inputsChange();
 };
 
 page();
 
-//REGEX AND FORM INPUTS CONTROL
+//***********************************************************/
+//*************** PARTIS FORMULAIRE + FETCH *****************/
+//***********************************************************/
 
+//REGEX AND FORM INPUTS CONTROL
 //***Doit contenir 1 lettre mini, peut contenir -/ /' ***/
-const nameReg = /^[a-zA-Zéèàîïùâ]+(([' -][a-zA-Z ])?[a-zA-Zéèàîïùâ]*)*$/ ;
+const nameReg = /^[a-zA-Zéèàîïùâ]+(([' -][a-zA-Z ])?[a-zA-Zéèàîïùâ]*)*$/;
 //*** numeric and letter _ . - + numeric and letters min 2 max 10 + letters min 2 max 5 ***/
 const emailReg = "^[a-zA-Z0-9._-]+@[a-zA-Z0-9]{2,10}\.[a-zA-Z]{2,5}$";
 //*** regex for adress ***/
-const addressReg = /^[a-zA-Z0-9\s,'-]*$/
+const addressReg = /^[a-zA-Z0-9\s,'-]*$/;
 
 //variable pour recuperer les données du formulaire
 let firstName, lastName, address, city, email;
@@ -156,7 +156,6 @@ const inputControl = (data, regex) => {
 };
 
 //fonction d'affichage d'erreur d'entré et implémentation des données utilisateurs
-
 const handleUserData = (event, regex, targetId, errorMsg) => {
     if(!inputControl(event.target.value, regex)){
         if(event.target.value.length < 1){
@@ -167,7 +166,7 @@ const handleUserData = (event, regex, targetId, errorMsg) => {
         return null;
     }else{
         document.getElementById(targetId).textContent = '';
-         return event.target.value;
+        return event.target.value;
     };
 };
 
@@ -182,27 +181,22 @@ const inputsChange = () => {
                 case 'firstName':
                     errorMsg = 'Veuillez rentrer un prénom valide';
                     firstName = handleUserData(e, nameReg, "firstNameErrorMsg", errorMsg);
-                    console.log(firstName);
                     break
                 case 'lastName':
                     errorMsg = 'Veuillez rentrer un nom valide';
                     lastName = handleUserData(e, nameReg, "lastNameErrorMsg", errorMsg);
-                    console.log(lastName);
                     break
                 case 'address':
                     errorMsg = 'Veuillez rentrer une adress valide';
                     address = handleUserData(e, addressReg, "addressErrorMsg", errorMsg);
-                    console.log(address);
                     break
                 case 'city':
                     errorMsg = 'Veuillez rentrer une ville valide';
                     city = handleUserData(e, nameReg, "cityErrorMsg", errorMsg);
-                    console.log(city);
                     break
                 case 'email':
                     errorMsg = 'Veuillez rentrer une adresse mail valide';
                     email = handleUserData(e, emailReg, "emailErrorMsg", errorMsg);
-                    console.log(email);
                     break
                 default:
                 break
@@ -212,17 +206,16 @@ const inputsChange = () => {
 };
 
 // validation de la commande et envoi
-
 document.querySelector('form').addEventListener('submit', e => {
     e.preventDefault();
     let cart = JSON.parse(localStorage.getItem('cart'));
-    console.log(cart);
+
     if(firstName && lastName && address && city && email && cart !== null){
         let contact = {firstName, lastName, address, city, email};
         let products = [];
         for(let item of cart){
             products.push(item.productId);
-        }
+        };
 
         fetch("http://localhost:3000/api/products/order", {
             method: "POST",
@@ -238,14 +231,13 @@ document.querySelector('form').addEventListener('submit', e => {
             window.location = `/P5-Dev-Web-Kanap/front/html/confirmation.html?id=${data.orderId}`
         })
         .catch(err => {
-            alert('Une erreur est survenue !')
-            console.log(err)
-        })
-        
+            alert('Une erreur est survenue !');
+            console.log(err);
+        });  
     }else{
-        alert("le formulaire est mal remplis ou le pannier est vide !")
-    }
-})
+        alert("le formulaire est mal remplis ou le pannier est vide !");
+    };
+});
 
 
 

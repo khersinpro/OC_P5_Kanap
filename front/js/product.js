@@ -1,7 +1,9 @@
+import { getCart, saveCart } from './reusableFunction.js';
 const url = new URL(window.location.href);
 const productId =  new URLSearchParams(url.search).get('id');
 let productData;
 
+//*** recupération des produits avec l'API ***/
 const getProduct = async () => {
     await fetch(`http://localhost:3000/api/products/${productId}`)
     .then(res=> res.json())
@@ -9,16 +11,18 @@ const getProduct = async () => {
     .catch(err => console.log(err));
 
     displayProduct();
-}
+};
 
+//*** Fonction d'affichage des données de l'article ***/
 const displayProduct = () => {
     let image = document.querySelector('.item__img');
     let productName = document.getElementById('title');
     let price = document.getElementById('price');
-    let description = document.getElementById('description')
+    let description = document.getElementById('description');
     let colors = document.getElementById('colors');
     let title = document.querySelector('title');
 
+    //affichage des données de l'article
     image.innerHTML = `<img src="${productData.imageUrl}" alt="${productData.altTxt}">`;
     description.textContent = productData.description;
     price.textContent = productData.price;
@@ -29,23 +33,7 @@ const displayProduct = () => {
     );
 }
 
-
-// sauvegarde du cart
-const saveCart = (articles) => {
-    localStorage.setItem("cart", JSON.stringify(articles));
-}
-
-// recupération de localestorage, si pas de localeStorage la fonction retourne un array vide
-const getCart = () => {
-    let cart = localStorage.getItem('cart');
-    if(cart == null){
-        return [];
-    }else{
-        return JSON.parse(cart);
-    }
-}
-
-// ajouter un article
+//*** ajouter un article au panier en gerant la quantité ***/
 const addProduct = (article) => {
     // insertion du panier vide ou non dans la variable products
     let products = getCart();
@@ -59,10 +47,10 @@ const addProduct = (article) => {
     }else{
         //ajout du prodruit dans la variable products grace a push()
         products.push(article);
-    }
+    };
     //sauvegarde du tableau contenant les objets produits dans le localeStorage
     saveCart(products);
-}
+};
 
 //EventListerner au clic sur le bouton commandé
 //cette fonction permet de verifier si l'article commandé est conforme et de l'ajouter au panier
@@ -81,6 +69,7 @@ cartBtn.addEventListener('click', (e) => {
         }; 
 
         addProduct({productId, quantity, color, productImg, name});
+        alert('Produit ajouté !');
 });
 
 getProduct();
