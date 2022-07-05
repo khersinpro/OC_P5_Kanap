@@ -4,17 +4,17 @@ const productId =  new URLSearchParams(url.search).get('id');
 let productData;
 
 //*** recupération des produits avec l'API ***/
-const getProduct = async () => {
+const getOneProduct = async () => {
     await fetch(`http://localhost:3000/api/products/${productId}`)
     .then(res=> res.json())
     .then(data => productData = data)
     .catch(err => console.log(err));
 
-    displayProduct();
+    displayOneProduct();
 };
 
 //*** Fonction d'affichage des données de l'article ***/
-const displayProduct = () => {
+const displayOneProduct = () => {
     let image = document.querySelector('.item__img');
     let productName = document.getElementById('title');
     let price = document.getElementById('price');
@@ -72,6 +72,6 @@ cartBtn.addEventListener('click', (e) => {
         alert('Produit ajouté !');
 });
 
-getProduct();
+getOneProduct();
 
 
