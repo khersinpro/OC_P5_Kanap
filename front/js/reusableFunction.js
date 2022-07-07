@@ -6,9 +6,9 @@ export const getCart = () => {
     }else{
         return JSON.parse(cart);
     }
-}
+};
 
 // sauvegarde du cart
 export const saveCart = (articles) => {
     localStorage.setItem("cart", JSON.stringify(articles));
-}
+};

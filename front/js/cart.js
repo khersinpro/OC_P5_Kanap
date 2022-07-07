@@ -17,13 +17,17 @@ const getproducts = async () => {
 
 //*** modifier la quantité d'un produit ***//
 const modifyQuantity = () => {
-    let buttonQuantity = document.querySelectorAll('.cart__item');
+    const buttonQuantity = document.querySelectorAll('.cart__item');
     let data = getCart();
 
     buttonQuantity.forEach(button => {
         button.addEventListener("change", e => {
             let product = data.find( data => data.productId === button.dataset.id  && data.color === button.dataset.color );
             if(product !== undefined){
+                if(e.target.value > 100){
+                    e.target.value = 100;
+                    return alert("Pas plus de 100 articles")
+                }
                 product.quantity = e.target.value; 
                 e.path[3].childNodes[1].childNodes[5].textContent = price(product);
                 saveCart(data)
@@ -36,8 +40,8 @@ const modifyQuantity = () => {
 
 //*** supprimer un produit ***//
 const deleteItem = () => {
-    let deleteBtn = document.querySelectorAll(".deleteItem");
-    let data = getCart();
+    const deleteBtn = document.querySelectorAll(".deleteItem");
+    const data = getCart();
     
     deleteBtn.forEach(button => {
         button.addEventListener("click", e => {
@@ -51,7 +55,7 @@ const deleteItem = () => {
 //*** affichage du pannier en recuperant le localestorage ***//
 const displayCart = () => {
     const cartContainer =  document.getElementById('cart__items');
-    let cartData = getCart();
+    const cartData = getCart();
 
     //methode sort pour tier la tableau d'objet par l'id grace a localecompare
     let sortCart = cartData.sort(function(a, b) { 
@@ -65,7 +69,7 @@ const displayCart = () => {
         `
         <article class="cart__item" data-id="${data.productId}" data-color="${data.color}">
             <div class="cart__item__img">
-                <img src="${data.productImg}" alt="Photographie d'un canapé">
+                <img src="${data.productImg}" alt="${data.altTxt}">
             </div>
             <div class="cart__item__content">
                 <div class="cart__item__content__description">
@@ -208,7 +212,7 @@ const inputsChange = () => {
 // validation de la commande et envoi
 document.querySelector('form').addEventListener('submit', e => {
     e.preventDefault();
-    let cart = JSON.parse(localStorage.getItem('cart'));
+    const cart = JSON.parse(localStorage.getItem('cart'));
 
     if(firstName && lastName && address && city && email && cart !== null){
         let contact = {firstName, lastName, address, city, email};
@@ -220,15 +224,15 @@ document.querySelector('form').addEventListener('submit', e => {
         fetch("http://localhost:3000/api/products/order", {
             method: "POST",
             headers: { 
-            'Accept': 'application/json', 
-            'Content-Type': 'application/json' 
-        },
-        body: JSON.stringify({contact , products})
+                'Accept': 'application/json', 
+                'Content-Type': 'application/json' 
+            },
+            body: JSON.stringify({contact , products})
         })
         .then(res => res.json())
         .then(data =>{ 
             localStorage.clear()
-            window.location = `/P5-Dev-Web-Kanap/front/html/confirmation.html?id=${data.orderId}`
+            window.location = `/front/html/confirmation.html?id=${data.orderId}`
         })
         .catch(err => {
             alert('Une erreur est survenue !');
