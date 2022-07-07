@@ -82,8 +82,6 @@ cartBtn.addEventListener('click', (e) => {
             return alert('Veuillez choisir une quantité');
         }; 
 
-        console.log({productId, quantity, color, productImg, name, altTxt});
-
         addProduct({productId, quantity, color, productImg, name, altTxt});
 });
 
