@@ -191,7 +191,7 @@ const inputsChange = () => {
                     lastName = handleUserData(e, nameReg, "lastNameErrorMsg", errorMsg);
                     break
                 case 'address':
-                    errorMsg = 'Veuillez rentrer une adress valide';
+                    errorMsg = 'Veuillez rentrer une adresse valide';
                     address = handleUserData(e, addressReg, "addressErrorMsg", errorMsg);
                     break
                 case 'city':
